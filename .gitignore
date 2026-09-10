@@ -1,0 +1,27 @@
+# Salesforce
+.sfdx/
+.sf/
+.forceignore
+
+# Node
+node_modules/
+
+# Jest
+coverage/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# Environment / secrets
+.env
+.env.*
+
+# Salesforce local files
+*.sfdx

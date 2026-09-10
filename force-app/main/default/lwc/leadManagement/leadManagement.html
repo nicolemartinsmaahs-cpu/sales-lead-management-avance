@@ -1,0 +1,159 @@
+<template>
+    <lightning-card title="Lead Management" icon-name="standard:lead">
+
+        <div class="slds-p-around_medium">
+
+            <!-- Spinner -->
+            <template if:true={isLoading}>
+                <lightning-spinner
+                    alternative-text="Carregando Leads"
+                    size="medium">
+                </lightning-spinner>
+            </template>
+
+            <!-- Mensagem de erro -->
+            <template if:true={errorMessage}>
+                <div class="slds-notify slds-notify_alert slds-alert_error slds-m-bottom_medium">
+                    <span>{errorMessage}</span>
+                </div>
+            </template>
+
+            <!-- Resumo de Leads -->
+            <div class="slds-m-bottom_large">
+
+                <h2 class="slds-text-heading_small slds-m-bottom_small">
+                    Resumo de Leads
+                </h2>
+
+                <div class="slds-grid slds-wrap slds-gutters">
+
+                    <!-- Open -->
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                        <article class="slds-card slds-card_boundary">
+                            <div class="slds-card__body slds-card__body_inner">
+                                <div class="slds-text-title">
+                                    Open - Not Contacted
+                                </div>
+
+                                <div class="slds-text-heading_large slds-m-top_x-small">
+                                    {openLeadCount}
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+
+                    <!-- Working -->
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                        <article class="slds-card slds-card_boundary">
+                            <div class="slds-card__body slds-card__body_inner">
+                                <div class="slds-text-title">
+                                    Working - Contacted
+                                </div>
+
+                                <div class="slds-text-heading_large slds-m-top_x-small">
+                                    {workingLeadCount}
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+
+                    <!-- Qualified -->
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                        <article class="slds-card slds-card_boundary">
+                            <div class="slds-card__body slds-card__body_inner">
+                                <div class="slds-text-title">
+                                    Qualified
+                                </div>
+
+                                <div class="slds-text-heading_large slds-m-top_x-small">
+                                    {qualifiedLeadCount}
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="slds-grid slds-wrap slds-gutters">
+
+                <!-- Busca -->
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                    <lightning-input
+                        type="search"
+                        label="Buscar Lead"
+                        placeholder="Digite nome ou empresa..."
+                        value={searchTerm}
+                        onchange={handleSearch}>
+                    </lightning-input>
+                </div>
+
+                <!-- Status -->
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                    <lightning-combobox
+                        label="Status"
+                        value={selectedStatus}
+                        options={statusOptions}
+                        onchange={handleStatusChange}>
+                    </lightning-combobox>
+                </div>
+
+            </div>
+
+            <!-- Botão Atualizar -->
+            <div class="slds-m-top_medium">
+                <lightning-button
+                    label="Atualizar"
+                    icon-name="utility:refresh"
+                    onclick={handleRefresh}>
+                </lightning-button>
+            </div>
+
+            <!-- Contador -->
+            <div class="slds-m-top_medium slds-text-body_regular">
+                <strong>{recordCountLabel}</strong>
+            </div>
+
+            <!-- Tabela -->
+            <div class="slds-m-top_small">
+
+                <template if:true={filteredLeads}>
+                    <lightning-datatable
+                        key-field="Id"
+                        data={filteredLeads}
+                        columns={columns}
+                        hide-checkbox-column>
+                    </lightning-datatable>
+                </template>
+
+            </div>
+
+            <!-- Paginação -->
+            <div class="slds-m-top_medium slds-grid slds-grid_align-center slds-grid_vertical-align-center">
+
+                <lightning-button
+                    label="Anterior"
+                    icon-name="utility:chevronleft"
+                    onclick={handlePreviousPage}
+                    disabled={isPreviousDisabled}>
+                </lightning-button>
+
+                <span class="slds-m-horizontal_medium">
+                    Página {pageNumber}
+                </span>
+
+                <lightning-button
+                    label="Próxima"
+                    icon-name="utility:chevronright"
+                    icon-position="right"
+                    onclick={handleNextPage}
+                    disabled={isNextDisabled}>
+                </lightning-button>
+
+            </div>
+
+        </div>
+
+    </lightning-card>
+</template>
