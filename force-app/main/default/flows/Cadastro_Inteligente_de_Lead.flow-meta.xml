@@ -45,6 +45,38 @@
     <apiVersion>67.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <assignments>
+        <name>Lead_criado_Pessoa_Fisica</name>
+        <label>Lead criado — Pessoa Física</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>Lead_Criado</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Lead_Criado_Com_Sucesso</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Lead_criado_Pessoa_Juridica</name>
+        <label>Lead criado — Pessoa Jurídica</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>Lead_Criado</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Lead_Criado_Com_Sucesso</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
         <description>Prepara o CNPJ informado pelo usuário para envio à API ValidaSeguro.</description>
         <name>Preparar_CNPJ_para_Validacao</name>
         <label>Preparar CNPJ para Validação</label>
@@ -506,6 +538,9 @@
         <label>Criar Lead — Pessoa Física</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
+        <connector>
+            <targetReference>Lead_criado_Pessoa_Fisica</targetReference>
+        </connector>
         <inputAssignments>
             <field>CPF__c</field>
             <value>
@@ -586,6 +621,9 @@
         <label>Criar Lead — Pessoa Jurídica</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
+        <connector>
+            <targetReference>Lead_criado_Pessoa_Juridica</targetReference>
+        </connector>
         <inputAssignments>
             <field>CNPJ__c</field>
             <value>
@@ -1088,6 +1126,30 @@
         <showHeader>true</showHeader>
     </screens>
     <screens>
+        <name>Lead_Criado_Com_Sucesso</name>
+        <label>Lead_Criado_Com_Sucesso</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>true</allowPause>
+        <fields>
+            <name>Mensagem_Sucesso_Lead</name>
+            <fieldText>&lt;p&gt;&lt;strong&gt;Lead criado com sucesso!&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;&lt;br&gt;&lt;/p&gt;&lt;p&gt;&lt;strong&gt;O novo Lead foi cadastrado com sucesso.&lt;/strong&gt;&lt;strong style=&quot;color: rgb(45, 150, 54);&quot;&gt;&lt;span class=&quot;ql-cursor&quot;&gt;﻿&lt;/span&gt;&lt;/strong&gt;&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+    <screens>
         <name>Tipo_de_Cliente</name>
         <label>Tipo de Cliente</label>
         <locationX>0</locationX>
@@ -1133,5 +1195,15 @@
         <isCollection>false</isCollection>
         <isInput>false</isInput>
         <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <name>Lead_Criado</name>
+        <dataType>Boolean</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>true</isOutput>
+        <value>
+            <booleanValue>false</booleanValue>
+        </value>
     </variables>
 </Flow>

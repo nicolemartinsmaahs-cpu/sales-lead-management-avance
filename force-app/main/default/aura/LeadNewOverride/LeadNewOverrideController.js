@@ -12,33 +12,26 @@
 
         var status = event.getParam("status");
 
+        console.log("Flow Status:", status);
+
         if (status === "FINISHED" || status === "FINISHED_SCREEN") {
 
-            component.set("v.showSuccess", true);
+            var navEvt =
+                $A.get("e.force:navigateToObjectHome");
 
-            window.setTimeout(
-                $A.getCallback(function() {
+            if (navEvt) {
 
-                    var navEvt =
-                        $A.get("e.force:navigateToObjectHome");
+                navEvt.setParams({
+                    "scope": "Lead"
+                });
 
-                    if (navEvt) {
+                navEvt.fire();
 
-                        navEvt.setParams({
-                            "scope": "Lead"
-                        });
+            } else {
 
-                        navEvt.fire();
-
-                    } else {
-
-                        window.location.href =
-                            "/lightning/o/Lead/list";
-                    }
-
-                }),
-                1800
-            );
+                window.location.href =
+                    "/lightning/o/Lead/list";
+            }
         }
     },
 
