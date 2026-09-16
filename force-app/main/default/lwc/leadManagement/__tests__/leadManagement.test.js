@@ -1,4 +1,5 @@
 import { createElement } from '@lwc/engine-dom';
+import { refreshApex } from '@salesforce/apex';
 
 jest.mock(
     'lightning/uiListsApi',
@@ -25,6 +26,14 @@ jest.mock(
             default: createApexTestWireAdapter(jest.fn())
         };
     },
+    { virtual: true }
+);
+
+jest.mock(
+    '@salesforce/apex',
+    () => ({
+        refreshApex: jest.fn()
+    }),
     { virtual: true }
 );
 
@@ -343,5 +352,29 @@ describe('c-lead-management', () => {
 
         expect(element.shadowRoot.textContent)
             .toContain('Página 1');
+    });
+
+    it('atualiza os dados ao clicar no botão Atualizar', async () => {
+        const element = createElement('c-lead-management', {
+            is: LeadManagement
+        });
+
+        document.body.appendChild(element);
+
+        getListRecordsByName.emit(mockLeads);
+        getLeadCountByStatus.emit(mockLeadSummary);
+
+        await Promise.resolve();
+
+        const buttons =
+            element.shadowRoot.querySelectorAll('lightning-button');
+
+        const refreshButton = buttons[0];
+
+        refreshButton.click();
+
+        await Promise.resolve();
+
+        expect(refreshApex).toHaveBeenCalledTimes(2);
     });
 });

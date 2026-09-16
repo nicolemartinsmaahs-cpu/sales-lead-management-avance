@@ -1,10 +1,10 @@
 import { LightningElement, wire } from 'lwc';
+import { refreshApex } from '@salesforce/apex';
 import { getListRecordsByName } from 'lightning/uiListsApi';
 import getLeadCountByStatus from '@salesforce/apex/LeadManagementController.getLeadCountByStatus';
 
 export default class LeadManagement extends LightningElement {
     leads = [];
-    filteredLeads = [];
 
     selectedStatus = 'ALL';
     searchTerm = null;
@@ -22,11 +22,15 @@ export default class LeadManagement extends LightningElement {
     previousPageToken = null;
     pageNumber = 1;
 
-    // Filtro enviado diretamente para o Salesforce.
+    // Filtro enviado diretamente para o Salesforce
     whereFilter = null;
 
     // Resumo retornado pelo Apex
     leadSummary = {};
+
+    // Referências dos resultados dos wires
+    leadsWireResult;
+    summaryWireResult;
 
     columns = [
         {
@@ -119,7 +123,11 @@ export default class LeadManagement extends LightningElement {
         searchTerm: '$searchTerm',
         where: '$whereFilter'
     })
-    wiredLeads({ error, data }) {
+    wiredLeads(result) {
+        this.leadsWireResult = result;
+
+        const { error, data } = result;
+
         if (data) {
             this.errorMessage = '';
 
@@ -157,13 +165,10 @@ export default class LeadManagement extends LightningElement {
                     `/lightning/r/Lead/${record.id}/view`
             }));
 
-            this.filteredLeads = this.leads;
-
             this.isLoading = false;
 
         } else if (error) {
             this.leads = [];
-            this.filteredLeads = [];
             this.errorMessage =
                 this.getErrorMessage(error);
 
@@ -176,7 +181,11 @@ export default class LeadManagement extends LightningElement {
     // =========================================================
 
     @wire(getLeadCountByStatus)
-    wiredLeadSummary({ error, data }) {
+    wiredLeadSummary(result) {
+        this.summaryWireResult = result;
+
+        const { error, data } = result;
+
         if (data) {
             this.leadSummary = data;
             this.isLoadingSummary = false;
@@ -304,8 +313,7 @@ export default class LeadManagement extends LightningElement {
     // =========================================================
 
     get recordCountLabel() {
-        const count =
-            this.filteredLeads.length;
+        const count = this.leads.length;
 
         if (count === 1) {
             return '1 Lead nesta página';
@@ -318,7 +326,22 @@ export default class LeadManagement extends LightningElement {
     // ATUALIZAR
     // =========================================================
 
-    handleRefresh() {
-        window.location.reload();
+    async handleRefresh() {
+        this.isLoading = true;
+        this.isLoadingSummary = true;
+        this.errorMessage = '';
+
+        try {
+            await Promise.all([
+                refreshApex(this.leadsWireResult),
+                refreshApex(this.summaryWireResult)
+            ]);
+        } catch (error) {
+            this.errorMessage =
+                this.getErrorMessage(error);
+        } finally {
+            this.isLoading = false;
+            this.isLoadingSummary = false;
+        }
     }
 }

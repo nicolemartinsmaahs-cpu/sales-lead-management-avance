@@ -35,6 +35,31 @@ private class LeadManagementControllerTest {
         ));
 
         insert leads;
+
+        Lead convertedLead = new Lead(
+            FirstName = 'Teste',
+            LastName = 'Converted',
+            Company = 'Lead Convertido',
+            Status = 'Open - Not Contacted',
+            LeadSource = 'Web'
+        );
+
+        insert convertedLead;
+
+        Database.LeadConvert conversion = new Database.LeadConvert();
+        conversion.setLeadId(convertedLead.Id);
+        conversion.setDoNotCreateOpportunity(true);
+
+        LeadStatus convertedStatus = [
+            SELECT MasterLabel
+            FROM LeadStatus
+            WHERE IsConverted = true
+            LIMIT 1
+        ];
+
+        conversion.setConvertedStatus(convertedStatus.MasterLabel);
+
+        Database.convertLead(conversion);
     }
 
     @IsTest
@@ -49,17 +74,20 @@ private class LeadManagementControllerTest {
 
         System.assertEquals(
             2,
-            result.get('Open - Not Contacted')
+            result.get('Open - Not Contacted'),
+            'Deve retornar somente os 2 Leads Open não convertidos.'
         );
 
         System.assertEquals(
             3,
-            result.get('Working - Contacted')
+            result.get('Working - Contacted'),
+            'Deve retornar os 3 Leads Working não convertidos.'
         );
 
         System.assertEquals(
             1,
-            result.get('Qualified')
+            result.get('Qualified'),
+            'Deve retornar o 1 Lead Qualified não convertido.'
         );
     }
 }

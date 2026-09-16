@@ -5,6 +5,18 @@ public with sharing class LeadManagementController {
 
         Map<String, Integer> result = new Map<String, Integer>();
 
+        if (!Schema.sObjectType.Lead.isAccessible()) {
+            throw new AuraHandledException(
+                'Você não possui acesso ao objeto Lead.'
+            );
+        }
+
+        if (!Schema.sObjectType.Lead.fields.Status.isAccessible()) {
+            throw new AuraHandledException(
+                'Você não possui acesso ao campo Status do Lead.'
+            );
+        }
+
         for (AggregateResult ar : [
             SELECT Status, COUNT(Id) total
             FROM Lead

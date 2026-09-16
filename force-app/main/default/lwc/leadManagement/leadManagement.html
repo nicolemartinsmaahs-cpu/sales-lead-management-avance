@@ -118,10 +118,10 @@
             <!-- Tabela -->
             <div class="slds-m-top_small">
 
-                <template if:true={filteredLeads}>
+                <template if:true={leads}>
                     <lightning-datatable
                         key-field="Id"
-                        data={filteredLeads}
+                        data={leads}
                         columns={columns}
                         hide-checkbox-column>
                     </lightning-datatable>
