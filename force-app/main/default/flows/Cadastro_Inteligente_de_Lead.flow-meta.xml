@@ -1,44 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
     <actionCalls>
-        <name>Validar_CNPJ_ValidaSeguro</name>
-        <label>Validar CNPJ ValidaSeguro</label>
+        <name>Validar_CNPJ_CPF_CNPJ</name>
+        <label>Validar CNPJ CPF_CNPJ</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <actionName>ValidaSeguroCNPJ.Validar CNPJ ValidaSeguro</actionName>
-        <actionType>externalService</actionType>
+        <actionName>CpfCnpjValidator</actionName>
+        <actionType>apex</actionType>
         <connector>
             <targetReference>CNPJ_v_lido</targetReference>
         </connector>
         <flowTransactionModel>Automatic</flowTransactionModel>
         <inputParameters>
-            <name>cnpj</name>
+            <name>documento</name>
             <value>
-                <elementReference>CNPJ_Para_Validacao</elementReference>
+                <elementReference>CNPJ_Somente_Digitos</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
-        <nameSegment>ValidaSeguroCNPJ.Validar CNPJ ValidaSeguro</nameSegment>
+        <inputParameters>
+            <name>tipo</name>
+            <value>
+                <elementReference>Const_CNPJ</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <nameSegment>CpfCnpjValidator</nameSegment>
         <offset>0</offset>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </actionCalls>
     <actionCalls>
-        <name>Validar_CPF_ValidaSeguro</name>
-        <label>Validar CPF ValidaSeguro</label>
+        <name>Validar_CPF_CPF_CNPJ</name>
+        <label>Validar CPF CPF_CNPJ</label>
         <locationX>0</locationX>
         <locationY>0</locationY>
-        <actionName>ValidaSeguroCPF.Validar CPF ValidaSeguro</actionName>
-        <actionType>externalService</actionType>
+        <actionName>CpfCnpjValidator</actionName>
+        <actionType>apex</actionType>
         <connector>
             <targetReference>CPF_valido</targetReference>
         </connector>
         <flowTransactionModel>Automatic</flowTransactionModel>
         <inputParameters>
-            <name>cpf</name>
+            <name>documento</name>
             <value>
                 <elementReference>CPF_Somente_Digitos</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
             </value>
         </inputParameters>
-        <nameSegment>ValidaSeguroCPF.Validar CPF ValidaSeguro</nameSegment>
+        <inputParameters>
+            <name>tipo</name>
+            <value>
+                <elementReference>CPF</elementReference>
+                <inputConfiguratorMode>Resource</inputConfiguratorMode>
+            </value>
+        </inputParameters>
+        <nameSegment>CpfCnpjValidator</nameSegment>
         <offset>0</offset>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </actionCalls>
@@ -74,23 +90,6 @@
         </assignmentItems>
         <connector>
             <targetReference>Lead_Criado_Com_Sucesso</targetReference>
-        </connector>
-    </assignments>
-    <assignments>
-        <description>Prepara o CNPJ informado pelo usuário para envio à API ValidaSeguro.</description>
-        <name>Preparar_CNPJ_para_Validacao</name>
-        <label>Preparar CNPJ para Validação</label>
-        <locationX>0</locationX>
-        <locationY>0</locationY>
-        <assignmentItems>
-            <assignToReference>CNPJ_Para_Validacao</assignToReference>
-            <operator>Assign</operator>
-            <value>
-                <elementReference>CNPJ</elementReference>
-            </value>
-        </assignmentItems>
-        <connector>
-            <targetReference>Validar_CNPJ_ValidaSeguro</targetReference>
         </connector>
     </assignments>
     <choices>
@@ -381,6 +380,13 @@
             <stringValue>WhatsApp</stringValue>
         </value>
     </choices>
+    <constants>
+        <name>Const_CNPJ</name>
+        <dataType>String</dataType>
+        <value>
+            <stringValue>CNPJ</stringValue>
+        </value>
+    </constants>
     <customProperties>
         <name>ScreenProgressIndicator</name>
         <value>
@@ -401,7 +407,7 @@
             <name>CNPJ_Valido</name>
             <conditionLogic>and</conditionLogic>
             <conditions>
-                <leftValueReference>Validar_CNPJ_ValidaSeguro.2XX.valido</leftValueReference>
+                <leftValueReference>Validar_CNPJ_CPF_CNPJ.valido</leftValueReference>
                 <operator>EqualTo</operator>
                 <rightValue>
                     <booleanValue>true</booleanValue>
@@ -427,7 +433,7 @@
             <name>CPF_Valido_API</name>
             <conditionLogic>and</conditionLogic>
             <conditions>
-                <leftValueReference>Validar_CPF_ValidaSeguro.2XX.valido</leftValueReference>
+                <leftValueReference>Validar_CPF_CPF_CNPJ.valido</leftValueReference>
                 <operator>EqualTo</operator>
                 <rightValue>
                     <booleanValue>true</booleanValue>
@@ -483,7 +489,7 @@
         <expression>SUBSTITUTE(
     SUBSTITUTE(
         SUBSTITUTE(
-            {!CNPJ_Para_Validacao},
+            {!CNPJ},
             &quot;.&quot;,
             &quot;&quot;
         ),
@@ -708,7 +714,7 @@
         <allowFinish>true</allowFinish>
         <allowPause>true</allowPause>
         <connector>
-            <targetReference>Validar_CPF_ValidaSeguro</targetReference>
+            <targetReference>Validar_CPF_CPF_CNPJ</targetReference>
         </connector>
         <fields>
             <name>Nome</name>
@@ -889,7 +895,7 @@
         <allowFinish>true</allowFinish>
         <allowPause>true</allowPause>
         <connector>
-            <targetReference>Preparar_CNPJ_para_Validacao</targetReference>
+            <targetReference>Validar_CNPJ_CPF_CNPJ</targetReference>
         </connector>
         <fields>
             <name>Nome_da_Empresa</name>

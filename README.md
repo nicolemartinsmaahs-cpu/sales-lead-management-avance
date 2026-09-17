@@ -65,7 +65,7 @@ Essa abordagem busca reduzir código customizado quando o recurso nativo ou decl
           │                   │
           └─────────┬─────────┘
                     │
-              ValidaSeguro
+                 CPF.CNPJ
                     │
              Documento válido?
                 /          \
