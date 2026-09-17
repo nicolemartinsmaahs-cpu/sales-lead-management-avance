@@ -24,9 +24,11 @@ O projeto tem como objetivos:
 - Gerenciar Leads e seu ciclo de qualificação;
 - Validar documentos de identificação antes da criação do Lead;
 - Automatizar atividades de follow-up;
-- Demonstrar Lead Conversion;
+- Demonstrar o processo de Lead Conversion;
 - Gerenciar o pipeline de Opportunities;
-- Demonstrar desenvolvimento com Apex e Lightning Web Components;
+- Desenvolver componentes com Lightning Web Components;
+- Desenvolver lógica customizada com Apex;
+- Integrar o Salesforce com uma API externa;
 - Implementar testes automatizados;
 - Aplicar boas práticas de segurança;
 - Utilizar Salesforce DX e Git/GitHub para versionamento.
@@ -39,7 +41,7 @@ A arquitetura segue a seguinte prioridade:
 
 **Salesforce Native → Configuração Declarativa → Flow → LWC/Aura → Apex quando necessário**
 
-Essa abordagem busca reduzir código customizado quando o recurso nativo ou declarativo atende ao requisito.
+Essa abordagem busca utilizar os recursos nativos do Salesforce sempre que possível, utilizando código customizado apenas quando existe uma necessidade técnica específica.
 
 ```text
                          Salesforce
@@ -61,7 +63,7 @@ Essa abordagem busca reduzir código customizado quando o recurso nativo ou decl
           │                   │
    Pessoa Física       Pessoa Jurídica
           │                   │
-       CPF API             CNPJ API
+        CPF                 CNPJ
           │                   │
           └─────────┬─────────┘
                     │
