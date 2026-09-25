@@ -277,3 +277,27 @@ force-app/
         │   └── LeadNewOverride/
         │
         └── flows/
+
+### Tratamento de exceções personalizadas
+
+O projeto também possui uma exceção Apex personalizada para representar erros específicos de validação de Leads:
+
+- `LeadValidationException`
+- `LeadValidationService`
+- `LeadValidationServiceTest`
+
+O `LeadValidationService` realiza validações em memória antes de qualquer operação de DML:
+
+- Lead nulo
+- Sobrenome obrigatório
+- Empresa obrigatória
+
+Quando uma regra é violada, o serviço lança `LeadValidationException` com uma mensagem específica para o cenário.
+
+A classe `LeadValidationServiceTest` cobre os cenários de sucesso e de exceção.
+
+Resultado dos testes:
+
+- 4 testes executados
+- 4 testes aprovados
+- Taxa de sucesso: 100%
