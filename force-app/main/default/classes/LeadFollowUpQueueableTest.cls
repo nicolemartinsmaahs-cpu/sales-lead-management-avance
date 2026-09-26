@@ -69,4 +69,48 @@ private class LeadFollowUpQueueableTest {
             leadConsultado.Description
         );
     }
+    @IsTest
+    static void deveFinalizarSemLeadsElegiveis() {
+
+        Lead leadNaoElegivel = new Lead(
+            FirstName = 'Queueable',
+            LastName = 'SemElegiveis',
+            Company = 'Avance Educação Profissional',
+            Status = 'Open - Not Contacted',
+            LeadSource = 'Other'
+        );
+
+        insert leadNaoElegivel;
+
+        Test.startTest();
+
+        Id jobId = System.enqueueJob(
+            new LeadFollowUpQueueable()
+        );
+
+        Test.stopTest();
+
+        Lead leadConsultado = [
+            SELECT Id, Status, Description
+            FROM Lead
+            WHERE Id = :leadNaoElegivel.Id
+        ];
+
+        System.assertNotEquals(
+            null,
+            jobId,
+            'O Queueable deveria retornar um Job ID.'
+        );
+
+        System.assertEquals(
+            'Open - Not Contacted',
+            leadConsultado.Status
+        );
+
+        System.assertEquals(
+            null,
+            leadConsultado.Description,
+            'O Queueable não deveria alterar Leads que não são elegíveis.'
+        );
+    }
 }

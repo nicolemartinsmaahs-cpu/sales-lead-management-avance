@@ -95,4 +95,49 @@ private class LeadFollowUpBatchTest {
             leadConsultado.Description
         );
     }
+    @IsTest
+    static void deveFinalizarSemLeadsElegiveis() {
+
+        Lead leadNaoElegivel = new Lead(
+            FirstName = 'Batch',
+            LastName = 'SemElegiveis',
+            Company = 'Avance Educação Profissional',
+            Status = 'Open - Not Contacted',
+            LeadSource = 'Other'
+        );
+
+        insert leadNaoElegivel;
+
+        Test.startTest();
+
+        Id jobId = Database.executeBatch(
+            new LeadFollowUpBatch(),
+            10
+        );
+
+        Test.stopTest();
+
+        Lead leadConsultado = [
+            SELECT Id, Status, Description
+            FROM Lead
+            WHERE Id = :leadNaoElegivel.Id
+        ];
+
+        System.assertNotEquals(
+            null,
+            jobId,
+            'O Batch deveria retornar um Job ID mesmo sem Leads elegíveis.'
+        );
+
+        System.assertEquals(
+            'Open - Not Contacted',
+            leadConsultado.Status
+        );
+
+        System.assertEquals(
+            null,
+            leadConsultado.Description,
+            'O Batch não deveria alterar Leads que não são elegíveis.'
+        );
+    }
 }

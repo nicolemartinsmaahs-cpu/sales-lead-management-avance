@@ -98,4 +98,41 @@ private class LeadBusinessHandlerTest {
             leadConsultado.Description
         );
     }
+    @IsTest
+    static void devePreencherDescricaoAoAtualizarLeadParaQualificado() {
+
+        Lead leadTeste = new Lead(
+            FirstName = 'Teste',
+            LastName = 'Atualizacao',
+            Company = 'Avance Educação Profissional',
+            Status = 'Open - Not Contacted',
+            LeadSource = 'Other'
+        );
+
+        insert leadTeste;
+
+        leadTeste.Status = 'Qualified';
+
+        Test.startTest();
+
+        update leadTeste;
+
+        Test.stopTest();
+
+        Lead leadConsultado = [
+            SELECT Id, Status, Description
+            FROM Lead
+            WHERE Id = :leadTeste.Id
+        ];
+
+        System.assertEquals(
+            'Qualified',
+            leadConsultado.Status
+        );
+
+        System.assertEquals(
+            'Lead qualificado automaticamente via Apex.',
+            leadConsultado.Description
+        );
+    }
 }
