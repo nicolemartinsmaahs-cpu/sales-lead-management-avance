@@ -43,27 +43,27 @@ A arquitetura segue a seguinte prioridade:
                                │
                           Sales Cloud
                                │
-                  ┌────────────┴────────────┐
-                  │                         │
+                  ┌────────────┴─────────────┐
+                  │                          │
                 Leads                 Opportunities
-                  │                         │
+                  │                          │
                   │                    Sales Pipeline
-                  │                         │
-                  ▼                         ▼
+                  │                          │
+                  ▼                          ▼
         Cadastro Inteligente         Closed Won / Lost
-                  │                         │
+                  │                          │
              Screen Flow             Enrollment Task
                   │
-          ┌───────┴────────┐
-          │                │
+          ┌───────┴──────────┐
+          │                  │
    Pessoa Física     Pessoa Jurídica
-          │                │
-        CPF              CNPJ
-          │                │
-          └───────┬────────┘
-                  │
+          │                  │
+        CPF                CNPJ
+          │                  │
+          └────────┬─────────┘
+                   │
               CPF.CNPJ API
-                  │
+                   │
           Documento válido?
              /          \
            Não           Sim
@@ -72,7 +72,7 @@ A arquitetura segue a seguinte prioridade:
                           │
                           ▼
                    Tela de sucesso
-
+```
 
 ---
 
@@ -82,24 +82,27 @@ O projeto também contempla implementações práticas utilizando Apex para apoi
 
 ### LeadApexService
 
-Classe responsável por operações básicas relacionadas a Leads:
+Classe responsável por operações relacionadas a Leads:
 
 - Buscar Leads não convertidos;
 - Criar Leads de teste;
-- Atualizar o Status de um Lead.
+- Atualizar o Status de um Lead;
+- Validar situações de erro durante a atualização.
 
 Principais conceitos demonstrados:
 
 - SOQL;
 - DML;
 - Métodos estáticos;
-- Manipulação de registros Salesforce.
+- Manipulação de registros Salesforce;
+- Tratamento de exceções;
+- Validação de cenários de borda.
 
 ### LeadBusinessTrigger e LeadBusinessHandler
 
 Trigger executada nos eventos `before insert` e `before update` de Leads.
 
-Quando um Lead possui o Status `Qualified` e não possui descrição, o Handler preenche automaticamente o campo Description com uma mensagem de acompanhamento.
+Quando um Lead possui o Status `Qualified` e não possui descrição, o Handler preenche automaticamente o campo `Description` com uma mensagem de acompanhamento.
 
 A implementação utiliza o padrão de separação entre Trigger e Handler, facilitando:
 
@@ -110,9 +113,9 @@ A implementação utiliza o padrão de separação entre Trigger e Handler, faci
 
 ### LeadFollowUpBatch
 
-Classe Batch Apex responsável por localizar Leads com o Status `Working - Contacted` e Description vazia.
+Classe Batch Apex responsável por localizar Leads com o Status `Working - Contacted`.
 
-Esses Leads recebem automaticamente a seguinte descrição:
+Durante o processamento, os registros são avaliados e aqueles que possuem `Description` vazia recebem automaticamente a seguinte descrição:
 
 > Acompanhamento comercial pendente via Batch Apex.
 
@@ -150,6 +153,37 @@ A implementação demonstra:
 
 ---
 
+## 🧩 Tratamento de exceções personalizadas
+
+O projeto possui uma exceção Apex personalizada para representar erros específicos relacionados à validação de Leads:
+
+### LeadValidationException
+
+Exceção customizada utilizada para representar situações de validação do domínio de Leads.
+
+### LeadValidationService
+
+Serviço responsável por realizar validações em memória antes de qualquer operação de DML.
+
+As regras implementadas incluem:
+
+- Lead nulo;
+- Sobrenome obrigatório;
+- Empresa obrigatória.
+
+Quando uma regra é violada, o serviço lança `LeadValidationException` com uma mensagem específica para o cenário.
+
+### Tratamento no LeadApexService
+
+O `LeadApexService` também utiliza `LeadValidationException` para tratar situações relacionadas à atualização de Leads:
+
+- ID do Lead não informado;
+- Lead não encontrado.
+
+Essa abordagem torna o comportamento dos métodos mais explícito e permite que o código consumidor diferencie erros de validação de outras exceções genéricas.
+
+---
+
 ## 🧪 Testes automatizados
 
 O projeto contém classes de teste Apex para validar o comportamento das implementações customizadas.
@@ -158,27 +192,127 @@ O projeto contém classes de teste Apex para validar o comportamento das impleme
 
 | Classe | Cenários validados |
 |---|---|
-| LeadApexServiceTest | Busca, criação e atualização de Leads |
-| LeadBusinessHandlerTest | Preenchimento condicional da Description |
-| LeadFollowUpBatchTest | Atualização de Leads elegíveis e preservação de descrições existentes |
-| LeadFollowUpQueueableTest | Processamento assíncrono e preservação de descrições existentes |
+| `LeadApexServiceTest` | Busca, criação, atualização, ausência de Leads, Lead convertido, ID nulo e ID inexistente |
+| `LeadBusinessHandlerTest` | Preenchimento condicional da `Description` |
+| `LeadFollowUpBatchTest` | Atualização de Leads elegíveis e preservação de descrições existentes |
+| `LeadFollowUpQueueableTest` | Processamento assíncrono e preservação de descrições existentes |
+| `LeadValidationServiceTest` | Lead válido, Lead nulo, ausência de sobrenome e ausência de empresa |
 
 Os testes utilizam recursos como:
 
 - `@IsTest`;
+- `@TestSetup`;
 - `Test.startTest()`;
 - `Test.stopTest()`;
+- `System.assert()`;
 - `System.assertEquals()`;
 - `System.assertNotEquals()`.
 
 ### Resultado dos testes
 
-A classe `LeadFollowUpQueueableTest` foi executada com:
+#### LeadValidationServiceTest
+
+Última execução:
+
+- 4 testes executados;
+- 4 testes aprovados;
+- Taxa de sucesso: 100%;
+- 0 falhas.
+
+Testes realizados:
+
+- `deveAceitarLeadValido`;
+- `deveRejeitarLeadNulo`;
+- `deveRejeitarLeadSemSobrenome`;
+- `deveRejeitarLeadSemEmpresa`.
+
+#### LeadApexServiceTest
+
+Última execução:
+
+- 7 métodos de teste executados;
+- 7 métodos aprovados;
+- Taxa de sucesso: 100%;
+- 0 falhas.
+
+Testes realizados:
+
+- `deveBuscarLeadsNaoConvertidos`;
+- `deveCriarLead`;
+- `deveAtualizarStatusDoLead`;
+- `deveRetornarListaVaziaQuandoNaoHouverLeads`;
+- `deveFalharAoAtualizarLeadInexistente`;
+- `deveFalharAoAtualizarComIdNulo`;
+- `deveIgnorarLeadConvertido`.
+
+O `@TestSetup` é executado separadamente durante a execução da classe e, por isso, o Salesforce apresenta um total de testes executados maior no resumo da execução.
+
+#### LeadBusinessHandlerTest
+
+Valida a regra de negócio responsável pelo preenchimento automático da `Description` quando o Lead possui Status `Qualified` e o campo está vazio.
+
+#### LeadFollowUpBatchTest
+
+Valida:
+
+- Processamento de Leads elegíveis;
+- Atualização automática da `Description`;
+- Preservação da descrição de registros que já possuem informação.
+
+#### LeadFollowUpQueueableTest
+
+Valida:
+
+- Execução assíncrona;
+- Identificação de Leads elegíveis;
+- Atualização condicional;
+- Preservação de descrições existentes.
+
+Resultado registrado anteriormente:
 
 - 2 testes executados;
 - 2 testes aprovados;
-- Taxa de sucesso de 100%;
-- 0 falhas.
+- Taxa de sucesso: 100%.
+
+---
+
+## 🔍 Testes de cenários de borda
+
+Os testes Apex também cobrem cenários de exceção e limites do serviço de Leads.
+
+No `LeadApexServiceTest` são validados:
+
+- Busca quando não existem Leads não convertidos;
+- Garantia de que Leads convertidos não sejam retornados;
+- Tratamento de ID nulo ao atualizar um Lead;
+- Tratamento de ID inexistente ao atualizar um Lead;
+- Atualização correta do Status;
+- Criação correta de Lead;
+- Consulta de Leads não convertidos.
+
+### Cenário sem Leads
+
+O teste `deveRetornarListaVaziaQuandoNaoHouverLeads` garante que `buscarLeadsNaoConvertidos()` retorne uma lista vazia quando não houver registros elegíveis.
+
+### Lead convertido
+
+O teste `deveIgnorarLeadConvertido` garante que Leads convertidos não sejam retornados pelo método de busca.
+
+### ID inexistente
+
+O teste `deveFalharAoAtualizarLeadInexistente` valida que um ID que não corresponde a um Lead gera uma `LeadValidationException` com mensagem específica.
+
+### ID nulo
+
+O teste `deveFalharAoAtualizarComIdNulo` valida que um ID não informado gera uma `LeadValidationException`.
+
+Essa abordagem demonstra preocupação com:
+
+- Caminhos de sucesso;
+- Dados ausentes;
+- Registros inexistentes;
+- Regras de validação;
+- Comportamentos fora do fluxo principal.
 
 ---
 
@@ -219,6 +353,18 @@ Funcionalidades demonstradas:
 
 O componente utiliza o `LeadManagementController` para consultar informações agregadas sobre Leads não convertidos.
 
+### Testes Jest
+
+O componente `leadManagement` possui testes automatizados utilizando Jest para validar seu comportamento.
+
+Os testes cobrem cenários relacionados à:
+
+- Renderização;
+- Pesquisa;
+- Filtros;
+- Paginação;
+- Integração com dados provenientes do Apex.
+
 ---
 
 ## 🔐 Segurança e qualidade
@@ -232,6 +378,17 @@ O projeto considera boas práticas de segurança e qualidade no desenvolvimento 
 - Automação declarativa antes de código customizado;
 - Testes automatizados;
 - Versionamento de código com Git.
+
+### Integração externa
+
+A validação de CPF e CNPJ utiliza uma API externa por meio de recursos configurados no Salesforce.
+
+A integração foi estruturada utilizando:
+
+- Named Credential;
+- Apex;
+- Invocable Method;
+- `@AuraEnabled`.
 
 ---
 
@@ -248,6 +405,7 @@ O projeto considera boas práticas de segurança e qualidade no desenvolvimento 
 - Salesforce DX;
 - Git;
 - GitHub;
+- Named Credentials;
 - API externa de validação de CPF e CNPJ.
 
 ---
@@ -265,6 +423,8 @@ force-app/
         │   ├── LeadBusinessHandler.cls
         │   ├── LeadFollowUpBatch.cls
         │   ├── LeadFollowUpQueueable.cls
+        │   ├── LeadValidationException.cls
+        │   ├── LeadValidationService.cls
         │   └── classes de teste
         │
         ├── triggers/
@@ -277,27 +437,98 @@ force-app/
         │   └── LeadNewOverride/
         │
         └── flows/
+```
 
-### Tratamento de exceções personalizadas
+---
 
-O projeto também possui uma exceção Apex personalizada para representar erros específicos de validação de Leads:
+## 🚀 Execução e desenvolvimento
 
-- `LeadValidationException`
-- `LeadValidationService`
-- `LeadValidationServiceTest`
+O projeto pode ser desenvolvido, validado e implantado utilizando Salesforce CLI e Salesforce DX.
 
-O `LeadValidationService` realiza validações em memória antes de qualquer operação de DML:
+Principais atividades realizadas no projeto:
 
-- Lead nulo
-- Sobrenome obrigatório
-- Empresa obrigatória
+- Desenvolvimento de Apex;
+- Criação de Flows;
+- Desenvolvimento de Lightning Web Components;
+- Desenvolvimento de Aura Component para override;
+- Integração com API externa;
+- Criação de testes automatizados;
+- Execução de testes Apex;
+- Execução de testes Jest;
+- Deploy de metadata;
+- Versionamento com Git;
+- Publicação no GitHub.
 
-Quando uma regra é violada, o serviço lança `LeadValidationException` com uma mensagem específica para o cenário.
+### Exemplos de comandos utilizados
 
-A classe `LeadValidationServiceTest` cobre os cenários de sucesso e de exceção.
+Executar testes Apex:
 
-Resultado dos testes:
+```powershell
+sf apex run test --tests LeadApexServiceTest --target-org AvanceEducacao --result-format human --wait 10
+```
 
-- 4 testes executados
-- 4 testes aprovados
-- Taxa de sucesso: 100%
+Executar testes de um serviço específico:
+
+```powershell
+sf apex run test --tests LeadValidationServiceTest --target-org AvanceEducacao --result-format human --wait 10
+```
+
+Realizar deploy de uma classe:
+
+```powershell
+sf project deploy start --source-dir force-app/main/default/classes/LeadApexService.cls --target-org AvanceEducacao
+```
+
+Verificar o estado do Git:
+
+```powershell
+git status
+```
+
+---
+
+## 🌱 Versionamento
+
+O projeto utiliza Git para controle de versão e GitHub para hospedagem do código-fonte.
+
+O desenvolvimento é realizado de forma incremental, com alterações organizadas em commits específicos para cada funcionalidade ou melhoria.
+
+Entre os commits realizados estão:
+
+```text
+1b691a9 docs: document Apex automation and project architecture
+b90cafe feat: add custom lead validation exceptions
+```
+
+---
+
+## 📌 Próximas melhorias
+
+Possíveis evoluções do projeto:
+
+- Implementação de Custom Metadata Types;
+- Evolução do tratamento de logs;
+- Expansão dos cenários de testes;
+- Ampliação das validações de negócio;
+- Evolução da interface de gerenciamento de Leads;
+- Novas integrações externas;
+- Maior cobertura de cenários negativos;
+- Evolução da observabilidade das automações assíncronas.
+
+---
+
+## 🎓 Objetivo do projeto de portfólio
+
+Este projeto foi desenvolvido para demonstrar conhecimentos práticos em diferentes áreas do ecossistema Salesforce, combinando:
+
+**Administração + Automação + Desenvolvimento + Integração + Testes + Versionamento**
+
+A proposta é representar um projeto próximo de um cenário empresarial, utilizando recursos nativos do Salesforce sempre que possível e desenvolvimento customizado quando necessário.
+
+---
+
+## 👩‍💻 Autora
+
+**Nicole Martins Maahs**
+
+Projeto desenvolvido como parte da transição de carreira para a área de Salesforce Development, com foco em desenvolvimento Apex, Lightning Web Components, automação e integração.
