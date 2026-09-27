@@ -3,11 +3,31 @@ public with sharing class LeadFollowUpQueueable
 
     public void execute(QueueableContext context) {
 
+        List<Lead_Automation_Configuration__mdt> configuracoes = [
+            SELECT Trigger_Status__c,
+                   Description_Message__c,
+                   Active__c
+            FROM Lead_Automation_Configuration__mdt
+            WHERE DeveloperName = 'Queueable_Follow_Up'
+            AND Active__c = true
+            LIMIT 1
+        ];
+
+        if (configuracoes.isEmpty()) {
+            System.debug(
+                'Configuração do Queueable não encontrada ou inativa.'
+            );
+            return;
+        }
+
+        Lead_Automation_Configuration__mdt configuracao =
+            configuracoes[0];
+
         List<Lead> leadsParaAtualizar = [
             SELECT Id, Status, Description
             FROM Lead
             WHERE IsConverted = false
-            AND Status = 'Working - Contacted'
+            AND Status = :configuracao.Trigger_Status__c
             LIMIT 50
         ];
 
@@ -17,7 +37,7 @@ public with sharing class LeadFollowUpQueueable
 
             if (String.isBlank(lead.Description)) {
                 lead.Description =
-                    'Acompanhamento comercial via Queueable Apex.';
+                    configuracao.Description_Message__c;
 
                 leadsElegiveis.add(lead);
             }
