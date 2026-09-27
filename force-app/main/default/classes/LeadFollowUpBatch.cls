@@ -15,6 +15,11 @@ public with sharing class LeadFollowUpBatch
         ];
 
         if (configuracoes.isEmpty()) {
+            System.debug(
+                LoggingLevel.WARN,
+                'Configuração do Batch não encontrada ou inativa.'
+            );
+
             return Database.getQueryLocator([
                 SELECT Id, Status, Description
                 FROM Lead
@@ -47,6 +52,10 @@ public with sharing class LeadFollowUpBatch
         ];
 
         if (configuracoes.isEmpty()) {
+            System.debug(
+                LoggingLevel.WARN,
+                'Configuração do Batch não encontrada ou inativa durante o processamento.'
+            );
             return;
         }
 
@@ -65,12 +74,22 @@ public with sharing class LeadFollowUpBatch
         if (!leadsParaAtualizar.isEmpty()) {
             update leadsParaAtualizar;
         }
+
+        System.debug(
+            LoggingLevel.INFO,
+            'Batch executado. Leads recebidos: ' +
+            leads.size() +
+            '. Leads atualizados: ' +
+            leadsParaAtualizar.size() +
+            '.'
+        );
     }
 
     public void finish(
         Database.BatchableContext context
     ) {
         System.debug(
+            LoggingLevel.INFO,
             'Batch de acompanhamento de Leads finalizado.'
         );
     }

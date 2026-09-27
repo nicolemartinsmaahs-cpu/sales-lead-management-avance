@@ -15,6 +15,7 @@ public with sharing class LeadFollowUpQueueable
 
         if (configuracoes.isEmpty()) {
             System.debug(
+                LoggingLevel.WARN,
                 'Configuração do Queueable não encontrada ou inativa.'
             );
             return;
@@ -48,7 +49,12 @@ public with sharing class LeadFollowUpQueueable
         }
 
         System.debug(
-            'Queueable de acompanhamento de Leads finalizado.'
+            LoggingLevel.INFO,
+            'Queueable finalizado. Leads encontrados: ' +
+            leadsParaAtualizar.size() +
+            '. Leads atualizados: ' +
+            leadsElegiveis.size() +
+            '.'
         );
     }
 }
