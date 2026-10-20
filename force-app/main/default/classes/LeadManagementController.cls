@@ -17,6 +17,12 @@ public with sharing class LeadManagementController {
             );
         }
 
+        if (!Schema.sObjectType.Lead.fields.IsConverted.isAccessible()) {
+            throw new AuraHandledException(
+                'Você não possui acesso ao campo IsConverted do Lead.'
+            );
+        }
+
         for (AggregateResult ar : [
             SELECT Status, COUNT(Id) total
             FROM Lead
