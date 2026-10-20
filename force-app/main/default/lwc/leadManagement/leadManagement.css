@@ -1,0 +1,151 @@
+/* Fundo geral do painel */
+.panel-surface {
+    background-color: #FBF8F5;
+    border-radius: 0.75rem;
+}
+
+/* Cabeçalho da Avance */
+.brand-header {
+    background-color: #702D3A;
+    color: #FFFFFF;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+    border-radius: 0.5rem;
+    border-bottom: 4px solid #C5A46D;
+}
+
+.brand-title {
+    margin: 0;
+    color: #FFFFFF;
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+.brand-subtitle {
+    margin: 0.4rem 0 0;
+    color: #FFFFFF;
+    font-size: 0.95rem;
+}
+
+/* Cards de resumo */
+.status-card {
+    background-color: #F7ECEE;
+    border: 1px solid #E3C9D0;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 6px rgba(112, 45, 58, 0.08);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.status-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(112, 45, 58, 0.14);
+}
+
+.status-card__value {
+    color: #702D3A;
+    font-weight: 700;
+}
+
+.status-card .slds-text-title {
+    color: #5A3B41;
+}
+
+/* Faixa de identificação da lista de Leads */
+.table-section-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    background-color: #702D3A;
+    color: #FFFFFF;
+    padding: 0.85rem 1.1rem;
+    border-bottom: 3px solid #C5A46D;
+    border-radius: 0.5rem;
+}
+
+.table-section-header__title {
+    margin: 0;
+    color: #FFFFFF;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.table-section-header__count {
+    color: #FFFFFF;
+    font-size: 0.875rem;
+}
+
+/* Cabeçalho com logotipo da Avance */
+.brand-header__content {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    min-width: 0;
+}
+
+.brand-logo {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+}
+
+.brand-logo img {
+    display: block;
+    width: 320px;
+    max-width: 40vw;
+    max-height: 80px;
+    height: auto;
+    object-fit: contain;
+}
+
+.brand-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+    padding-left: 1.5rem;
+    border-left: 2px solid #C5A46D;
+}
+
+.brand-text .brand-title {
+    margin: 0;
+    color: #FFFFFF;
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: 0;
+}
+
+.brand-text .brand-subtitle {
+    margin: 0.4rem 0 0;
+    color: #FFFFFF;
+    font-size: 0.95rem;
+}
+
+/* Ajuste para telas menores */
+@media (max-width: 600px) {
+    .brand-header__content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .brand-logo img {
+        width: 200px;
+        max-width: 100%;
+        max-height: 56px;
+    }
+
+    .brand-text {
+        width: 100%;
+        padding-left: 0;
+        padding-top: 0.75rem;
+        border-left: none;
+        border-top: 2px solid #C5A46D;
+    }
+
+    .brand-text .brand-title {
+        font-size: 1.1rem;
+    }
+}

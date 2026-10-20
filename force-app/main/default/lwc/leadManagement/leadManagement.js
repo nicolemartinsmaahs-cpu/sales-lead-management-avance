@@ -2,8 +2,10 @@ import { LightningElement, wire } from 'lwc';
 import { refreshApex } from '@salesforce/apex';
 import { getListRecordsByName } from 'lightning/uiListsApi';
 import getLeadCountByStatus from '@salesforce/apex/LeadManagementController.getLeadCountByStatus';
+import avanceLogo from '@salesforce/resourceUrl/avanceLogo';
 
 export default class LeadManagement extends LightningElement {
+	    logoUrl = avanceLogo;
     leads = [];
 
     selectedStatus = 'ALL';

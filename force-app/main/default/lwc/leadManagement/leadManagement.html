@@ -1,7 +1,30 @@
 <template>
-    <lightning-card title="Lead Management" icon-name="standard:lead">
+    <lightning-card>
 
-        <div class="slds-p-around_medium">
+        <div class="panel-surface slds-p-around_medium">
+            <!-- Cabeçalho da Avance com logotipo -->
+            <div class="brand-header">
+                <div class="brand-header__content">
+
+                    <div class="brand-logo">
+                        <img
+                            src={logoUrl}
+                            alt="Avance Educação Profissional"
+                        />
+                    </div>
+
+                    <div class="brand-text">
+                        <h1 class="brand-title">
+                            Sales Lead Management
+                        </h1>
+
+                        <p class="brand-subtitle">
+                            Gestão comercial de Leads
+                        </p>
+                    </div>
+
+                </div>
+            </div>
 
             <!-- Spinner -->
             <template if:true={isLoading}>
@@ -29,13 +52,13 @@
 
                     <!-- Open -->
                     <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
-                        <article class="slds-card slds-card_boundary">
+                        <article class="status-card slds-card slds-card_boundary">
                             <div class="slds-card__body slds-card__body_inner">
                                 <div class="slds-text-title">
                                     Open - Not Contacted
                                 </div>
 
-                                <div class="slds-text-heading_large slds-m-top_x-small">
+                                <div class="status-card__value slds-text-heading_large slds-m-top_x-small">
                                     {openLeadCount}
                                 </div>
                             </div>
@@ -44,13 +67,13 @@
 
                     <!-- Working -->
                     <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
-                        <article class="slds-card slds-card_boundary">
+                        <article class="status-card slds-card slds-card_boundary">
                             <div class="slds-card__body slds-card__body_inner">
                                 <div class="slds-text-title">
                                     Working - Contacted
                                 </div>
 
-                                <div class="slds-text-heading_large slds-m-top_x-small">
+                                <div class="status-card__value slds-text-heading_large slds-m-top_x-small">
                                     {workingLeadCount}
                                 </div>
                             </div>
@@ -59,13 +82,13 @@
 
                     <!-- Qualified -->
                     <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
-                        <article class="slds-card slds-card_boundary">
+                        <article class="status-card slds-card slds-card_boundary">
                             <div class="slds-card__body slds-card__body_inner">
                                 <div class="slds-text-title">
                                     Qualified
                                 </div>
 
-                                <div class="slds-text-heading_large slds-m-top_x-small">
+                                <div class="status-card__value slds-text-heading_large slds-m-top_x-small">
                                     {qualifiedLeadCount}
                                 </div>
                             </div>
@@ -110,9 +133,15 @@
                 </lightning-button>
             </div>
 
-            <!-- Contador -->
-            <div class="slds-m-top_medium slds-text-body_regular">
-                <strong>{recordCountLabel}</strong>
+            <!-- Cabeçalho da lista de Leads -->
+            <div class="table-section-header slds-m-top_medium">
+                <h2 class="table-section-header__title">
+                    Lista de Leads
+                </h2>
+
+                <span class="table-section-header__count">
+                    {recordCountLabel}
+                </span>
             </div>
 
             <!-- Tabela -->
